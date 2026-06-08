@@ -13,7 +13,7 @@ import glob
 import re
 
 # ===== API Key =====
-DEEPSEEK_API_KEY = "sk-6c8ad08e875d41bcb4f27783c8b8ba9f"
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 
 
 # ===== 财务计算工具 =====
