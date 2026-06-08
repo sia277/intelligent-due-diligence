@@ -1,5 +1,4 @@
 # 排除 API Key 泄露
-streamlit_app.py
 *.pyc
 __pycache__/
 .env
