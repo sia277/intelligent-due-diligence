@@ -88,7 +88,7 @@ def call_deepseek(prompt):
         "Content-Type": "application/json"
     }
     data = {
-        "model": "deepseek-chat",
+        "model": "deepseek-v4-flash",
         "messages": [
             {"role": "system", "content": "你是一名专业的投资尽调分析师。回答问题时要严谨、基于事实，严格依据提供的资料，不要杜撰信息。"},
             {"role": "user", "content": prompt}
