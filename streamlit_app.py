@@ -9,7 +9,18 @@ import requests
 import glob
 
 # ===== API Key =====
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", st.secrets.get("DEEPSEEK_API_KEY", "") if hasattr(st, "secrets") else "")
+def get_api_key():
+    """优先读取环境变量；仅在需要时访问 Streamlit Secrets。"""
+    key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
+    if key:
+        return key
+    try:
+        return str(st.secrets.get("DEEPSEEK_API_KEY", "")).strip()
+    except (FileNotFoundError, KeyError):
+        return ""
+
+
+DEEPSEEK_API_KEY = get_api_key()
 
 
 # ===== 文档加载 =====
@@ -83,6 +94,8 @@ def search_relevant(question, chunks):
 
 # ===== 调用 API =====
 def call_deepseek(prompt):
+    if not DEEPSEEK_API_KEY:
+        return "未配置 DEEPSEEK_API_KEY，请使用环境变量或 Streamlit Secrets，不要写入源码。"
     headers = {
         "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
         "Content-Type": "application/json"
@@ -102,10 +115,10 @@ def call_deepseek(prompt):
         )
         result = response.json()
         if 'choices' not in result:
-            return f"API 异常：{result.get('error', {}).get('message', '未知错误')}"
+            return "API 返回异常，请检查服务端配置、额度和模型设置。"
         return result['choices'][0]['message']['content']
-    except Exception as e:
-        return f"API 调用失败：{str(e)}"
+    except Exception:
+        return "API 请求失败，请检查网络和服务端配置。"
 
 
 # ===== RAG 问答 =====

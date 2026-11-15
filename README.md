@@ -45,7 +45,37 @@ pip install streamlit requests
 
 ### 配置 API Key
 
-打开 `streamlit_app.py`，将 `DEEPSEEK_API_KEY` 替换为你的 DeepSeek API Key。
+**不要把真实密钥写入 Python 源码、README、Git 提交、截图或聊天。**
+
+本地运行时，在启动应用的进程环境中设置 `DEEPSEEK_API_KEY`。例如在 macOS 的 zsh 中交互输入，避免把值直接写入命令历史：
+
+```zsh
+read -s 'DEEPSEEK_API_KEY?请输入 DeepSeek API Key: '; echo
+export DEEPSEEK_API_KEY
+streamlit run streamlit_app.py
+# 结束后从当前终端环境移除
+unset DEEPSEEK_API_KEY
+```
+
+命令行版本 `python app.py` 也读取此环境变量。项目不会自动加载 `.env` 文件。
+
+在 Streamlit Community Cloud 中，通过应用设置中的 Secrets 配置顶层字段 `DEEPSEEK_API_KEY`，不要在仓库中保存真实值。Web 版优先读取非空环境变量，否则读取 Streamlit Secrets。本地若使用 `.streamlit/secrets.toml`，该文件已列入 `.gitignore`；已被 Git 跟踪的文件不会因忽略规则自动移除。
+
+### 密钥安全与部署提醒
+
+- 曾公开的真实密钥应立即在服务商控制台撤销或轮换，并检查用量、账单及依赖服务；仅修改代码或删除文件不能使旧密钥失效。
+- 本次配置方式不清除历史提交，也不表示旧密钥已撤销。历史清理需单独评估分支、标签、克隆与部署影响。
+- 不要把真实尽调材料上传到公开演示；请求会将相关内容发送给模型服务。使用前确认授权和数据处理要求。
+- 当前示例不包含访问控制或调用限额。公开部署时，服务器密钥可能被任何访客触发消耗，应先配置访问限制和预算告警。
+- 错误提示不直接回显服务商响应或异常详情，避免意外暴露凭据或文档。
+
+### 离线配置检查
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+测试使用模拟请求，不验证真实密钥、不访问模型接口。
 
 ### 运行
 

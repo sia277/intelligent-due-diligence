@@ -13,7 +13,7 @@ import glob
 import re
 
 # ===== API Key =====
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "").strip()
 
 
 # ===== 财务计算工具 =====
@@ -118,6 +118,8 @@ def search_relevant(question, chunks):
 # ===== 调用 API =====
 def call_deepseek(messages, system_prompt=None):
     """支持传入完整消息列表（含历史记录）"""
+    if not DEEPSEEK_API_KEY:
+        return "未配置 DEEPSEEK_API_KEY，请在运行环境中设置，不要写入源码。"
     headers = {
         "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
         "Content-Type": "application/json"
@@ -141,10 +143,10 @@ def call_deepseek(messages, system_prompt=None):
         )
         result = response.json()
         if 'choices' not in result:
-            return f"API 返回异常：{result.get('error', {}).get('message', str(result))}"
+            return "API 返回异常，请检查服务端配置、额度和模型设置。"
         return result['choices'][0]['message']['content']
-    except Exception as e:
-        return f"调用 API 出错：{str(e)}"
+    except Exception:
+        return "API 请求失败，请检查网络和服务端配置。"
 
 
 # ===== 执行工具调用 =====
